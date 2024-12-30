@@ -90,6 +90,10 @@ AngleCraft is versatile and can be used for a wide range of purposes:
     - Start rendering your multi-view data.
 8. Check the output directory for rendered images.
 
+![Flux example](images/ui.gif)
+
+
+
 ## Training is Not Part of This Add-on
 
 It's important to know that **AngleCraft** contains **no AI training logic**. The add-on's primary focus is on generating high-quality multi-view datasets by capturing 3D models from various angles and lighting conditions. 
