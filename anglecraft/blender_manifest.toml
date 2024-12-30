@@ -1,0 +1,12 @@
+schema_version = "1.0.1"
+
+id = "synthcraft"
+version = "1.1.0"
+name = "SynthCraft"
+tagline = "Tool to synthesize datasets for AI or other projects by creating, rendering, and managing cameras around an object with HDRI environment options"
+maintainer = "Glenn De Backer <glenn.debacker@gmail.com>"
+type = "add-on"
+blender_version_min = "4.2.0"
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
