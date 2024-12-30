@@ -90,7 +90,7 @@ AngleCraft is versatile and can be used for a wide range of purposes:
     - Start rendering your multi-view data.
 8. Check the output directory for rendered images.
 
-![Flux example](images/ui.gif)
+![Flux example](images/ui.png)
 
 
 
