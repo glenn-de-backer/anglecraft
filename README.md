@@ -4,6 +4,9 @@
 
 This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in AI training but is also highly versatile, making it suitable for both AI-related and non-AI applications, such as 3D asset creation, animation, and visual effects.
 
+![Interface](images/gui.jpg)
+
+
 ## Features
 
 ### Camera Sphere Generation
