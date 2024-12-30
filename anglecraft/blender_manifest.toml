@@ -1,8 +1,8 @@
 schema_version = "1.0.1"
 
-id = "synthcraft"
-version = "1.1.0"
-name = "SynthCraft"
+id = "anglecraft"
+version = "1.0.0"
+name = "AngleCraft"
 tagline = "Tool to synthesize datasets for AI or other projects by creating, rendering, and managing cameras around an object with HDRI environment options"
 maintainer = "Glenn De Backer <glenn.debacker@gmail.com>"
 type = "add-on"
