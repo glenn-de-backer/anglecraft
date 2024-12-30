@@ -1,6 +1,6 @@
 # AngleCraft
 
-**AngleCraft** is a  Blender add-on designed to simplify the generation of multi-view synthetic data for AI training, 3D modeling, and various other applications. With AngleCraft, you can create sophisticated camera spheres to capture objects from multiple angles, customize render settings, and easily manage environments for seamless data creation.
+**AngleCraft** is a powerful Blender add-on designed to simplify the generation of multi-view synthetic data for AI training, 3D modeling, and various other applications. With AngleCraft, you can create sophisticated camera spheres to capture objects from multiple angles, customize render settings, and easily manage environments for seamless data creation.
 
 This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in AI training but is also highly versatile, making it suitable for both AI-related and non-AI applications, such as 3D asset creation, animation, and visual effects.
 
@@ -8,7 +8,7 @@ This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in A
 
 ### Camera Sphere Generation
 Automatically create camera spheres with customizable parameters, including:
-- Adjustable radius  
+- Adjustable radius (`min_radius` and `max_radius`).
 - Horizontal and vertical camera counts.
 - Sphere distribution types (e.g., linear, uniform, Fibonacci, weighted).
 - Half-sphere support for targeted angle captures.
@@ -23,6 +23,14 @@ Automatically create camera spheres with customizable parameters, including:
 ### Customizable Render Settings
 - Set output directories, resolution, and render samples.
 - Denoising options with support for OptiX and Open Image Denoise.
+
+### Streamlined Workflow
+Simple UI panels organized for ease of use:
+- Object Settings
+- Camera Settings
+- Camera Sphere Settings
+- Environment Settings
+- Render Settings
 
 ### Batch Rendering
 - Automatically render multiple views with a single click.
@@ -53,9 +61,9 @@ AngleCraft is versatile and can be used for a wide range of purposes:
 
 ## Installation
 
-1. Download or clone this repository.
+1. Go to the [Releases page](https://github.com/glenn-de-backer/anglecraft/releases) and download the latest version of the add-on.
 2. Open Blender and navigate to **Edit > Preferences > Add-ons**.
-3. Click **Install** and select the `.zip` file of this add-on.
+3. Click **Install from Disk** and select the `.zip` file you downloaded from the releases page.
 4. Enable the "AngleCraft" add-on in the preferences.
 5. The "AngleCraft" tab will appear in the 3D View sidebar (press `N`).
 
