@@ -25,7 +25,7 @@ Automatically create camera spheres with customizable parameters, including:
 
 ### Environment Setup
 - HDRI-based lighting with override options. If not overridden, the current world settings will be used.
-- Control over HDRI folders and world settings.
+- Use of random HDRI environments
 
 ### Customizable Render Settings
 - Set output directories, resolution, and render samples.
@@ -80,7 +80,7 @@ AngleCraft is versatile and can be used for a wide range of purposes:
 2. Set your **Camera Target** (of type **empty**) and optionally, set your **Floor Mesh** in the **Object Settings** panel.
 3. Configure your **Camera Sphere Settings**, including the radius, camera count, and distribution type.
 4. In the **Camera Settings** panel, you can select an existing camera to use as a base for the cameras in your sphere. The base camera will define properties such as the lens and other settings for the cameras created around the sphere.
-5. Adjust **Environment Settings**, such as HDRI lighting. If HDRI is not overridden, the current world settings will be used.
+5. Adjust **Environment Settings**, select the folder where your HDRI's are stored. If HDRI is not overridden, the current world settings will be used.
 6. **Fine-tune Render Settings**:
     - Set your **output folder** where the rendered images will be stored.
     - Adjust other settings such as resolution and render samples.
