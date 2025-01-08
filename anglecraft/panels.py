@@ -168,18 +168,21 @@ class AngleCraftActionsButtonPanel(bpy.types.Panel):
         
         # Check if a target empty is selected
         target_selected = bool(context.scene.lora_object_settings.object_name)
+        
+        # Check if any cameras with '_ai' suffix exist
+        cameras_exist = any(camera for camera in bpy.data.objects if camera.type == 'CAMERA' and '_ai' in camera.name)
 
-        # Create buttons and disable them if no target empty is selected
+        # Create buttons and disable them if no target empty is selected or no cameras exist
         row = box.row()
         row.enabled = target_selected
         row.operator("object.create_lora_cameras")
         
         row = box.row()
-        row.enabled = target_selected
+        row.enabled = cameras_exist
         row.operator("object.delete_lora_cameras")
         
         row = box.row()
-        row.enabled = target_selected
+        row.enabled = cameras_exist
         row.operator("object.render_lora_cameras")
 
         # Add another box for the label to avoid overlap
