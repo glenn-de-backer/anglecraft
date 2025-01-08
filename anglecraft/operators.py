@@ -197,6 +197,16 @@ def equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, rad
     return points
 
 def remove_overlapping_cameras(points, threshold):
+    """
+    Remove overlapping cameras by filtering out points that are too close to each other.
+    
+    Args:
+        points (List[tuple]): A list of 3D coordinates representing points on the sphere.
+        threshold (float): The minimum distance between cameras to avoid overlap.
+    
+    Returns:
+        List[Vector]: A list of 3D coordinates with overlapping points removed.
+    """    
     filtered_points = []
     for point in points:
         # Convert point to Vector
@@ -206,6 +216,30 @@ def remove_overlapping_cameras(points, threshold):
     return filtered_points
 
 def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, num_cameras_vertical, distribution_type="fibonacci", half_sphere=False, camera_base=None, remove_overlapping=False, overlap_threshold=0.1):
+    """
+    Create cameras in a spherical arrangement around a target object.
+    
+    This function generates points on a sphere based on the specified distribution type,
+    places cameras at those points, and optionally removes overlapping cameras.
+    
+    Args:
+        object_name (str): The name of the target object.
+        min_radius (float): The minimum distance of cameras from the object.
+        max_radius (float): The maximum distance of cameras from the object.
+        num_cameras_horizontal (int): The number of cameras in the horizontal circle.
+        num_cameras_vertical (int): The number of vertical levels of cameras.
+        distribution_type (str): The type of sphere generation ('fibonacci', 'linear', 'uniform', 'equator_dense', 'weighted').
+        half_sphere (bool): If True, create only the upper half of the cameras.
+        camera_base (str): The name of the base camera to clone, or None to create new cameras.
+        remove_overlapping (bool): If True, remove overlapping cameras.
+        overlap_threshold (float): The minimum distance between cameras to avoid overlap.
+    
+    Returns:
+        List[bpy.types.Object]: A list of created camera objects.
+    
+    Raises:
+        ValueError: If the target object is not found or an unknown distribution type is specified.
+    """
     target_object = bpy.data.objects.get(object_name)
     if not target_object:
         raise ValueError(f"Object named '{object_name}' not found!")
