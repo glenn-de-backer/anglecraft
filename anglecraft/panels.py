@@ -69,7 +69,9 @@ class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
         box.prop(params, "num_cameras_vertical")
         box.prop(params, "sphere_type")  # Add sphere type dropdown
         box.prop(params, "half_sphere")  # Add half sphere option
-
+        box.prop(params, "remove_overlapping")
+        box.prop(params, "overlap_threshold")
+        
 # Panel for Environment Settings
 class AngleCraftEnvironmentSettingsPanel(bpy.types.Panel):
     """

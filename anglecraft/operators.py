@@ -196,9 +196,16 @@ def equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, rad
             points.append((x, y, z))
     return points
 
+def remove_overlapping_cameras(points, threshold):
+    filtered_points = []
+    for point in points:
+        # Convert point to Vector
+        point_vec = Vector(point)
+        if all((point_vec - Vector(other)).length >= threshold for other in filtered_points):
+            filtered_points.append(point_vec)
+    return filtered_points
 
-# Function to create cameras around a target object
-def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, num_cameras_vertical, distribution_type="fibonacci", half_sphere=False, camera_base=None):
+def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, num_cameras_vertical, distribution_type="fibonacci", half_sphere=False, camera_base=None, remove_overlapping=False, overlap_threshold=0.1):
     target_object = bpy.data.objects.get(object_name)
     if not target_object:
         raise ValueError(f"Object named '{object_name}' not found!")
@@ -218,32 +225,27 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
     else:
         raise ValueError(f"Unknown distribution type: {distribution_type}")
 
-    # Store created cameras
-    cameras = []
+    if remove_overlapping:
+        points = remove_overlapping_cameras(points, overlap_threshold)
 
+    cameras = []
     for idx, point in enumerate(points):
-        # Randomly select a radius between min_radius and max_radius
         radius = random.uniform(min_radius, max_radius)
         camera_location = target_object.location + Vector(point) * radius
 
         if base_camera:
-            # Clone the base camera
             new_camera = base_camera.copy()
             new_camera.data = base_camera.data.copy()
             new_camera.location = camera_location
             bpy.context.collection.objects.link(new_camera)
         else:
-            # Create a new camera
             bpy.ops.object.camera_add(location=camera_location)
             new_camera = bpy.context.object
 
-        # Point the camera at the object
         direction = target_object.location - new_camera.location
         new_camera.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
 
-        # Name the camera with the suffix "_ai"
         new_camera.name = f"{target_object.name}_ai_{idx}"
-
         cameras.append(new_camera)
 
     print(f"Created {len(cameras)} cameras around '{object_name}'.")
@@ -398,6 +400,8 @@ class AngleCraftCreateCamerasOperator(bpy.types.Operator):
         distribution_type = context.scene.lora_camera_sphere_settings.sphere_type
         half_sphere = context.scene.lora_camera_sphere_settings.half_sphere
         camera_base = context.scene.lora_camera_settings.camera_base
+        remove_overlapping = context.scene.lora_camera_sphere_settings.remove_overlapping
+        overlap_threshold = context.scene.lora_camera_sphere_settings.overlap_threshold
 
         # Create cameras around the object
         cameras = create_cameras(
@@ -408,14 +412,16 @@ class AngleCraftCreateCamerasOperator(bpy.types.Operator):
             num_cameras_vertical=num_cameras_vertical,
             distribution_type=distribution_type,
             half_sphere=half_sphere,
-            camera_base=camera_base
+            camera_base=camera_base,
+            remove_overlapping=remove_overlapping,
+            overlap_threshold=overlap_threshold
         )
 
         # Update number of cameras
         context.scene.lora_render_button_settings.info_num_cameras = len(cameras)        
 
         return {'FINISHED'}
-
+    
 # Operator to render from the created cameras
 class AngleCraftRenderCamerasOperator(bpy.types.Operator):
     """
