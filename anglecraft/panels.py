@@ -147,7 +147,6 @@ class AngleCraftDenoiseSettingsPanel(bpy.types.Panel):
         box.prop(params, "denoise_enabled")
         box.prop(params, "denoiser")
 
-        
 # Panel for Actions Button
 class AngleCraftActionsButtonPanel(bpy.types.Panel):
     """
@@ -166,10 +165,22 @@ class AngleCraftActionsButtonPanel(bpy.types.Panel):
         params = scene.lora_render_button_settings
 
         box = layout.box()
-    
-        box.operator("object.create_lora_cameras")
-        box.operator("object.delete_lora_cameras")       
-        box.operator("object.render_lora_cameras")
+        
+        # Check if a target empty is selected
+        target_selected = bool(context.scene.lora_object_settings.object_name)
+
+        # Create buttons and disable them if no target empty is selected
+        row = box.row()
+        row.enabled = target_selected
+        row.operator("object.create_lora_cameras")
+        
+        row = box.row()
+        row.enabled = target_selected
+        row.operator("object.delete_lora_cameras")
+        
+        row = box.row()
+        row.enabled = target_selected
+        row.operator("object.render_lora_cameras")
 
         # Add another box for the label to avoid overlap
         info_box = layout.box()
