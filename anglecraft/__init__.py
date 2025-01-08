@@ -1,6 +1,6 @@
 import bpy
 from .operators import AngleCraftCreateCamerasOperator, AngleCraftRenderCamerasOperator, AngleCraftDeleteCamerasOperator
-from .panels import AngleCraftObjectSettingsPanel, AngleCraftCameraSettingsPanel, AngleCraftCameraSphereSettingsPanel, AngleCraftEnvironmentSettingsPanel, AngleCraftRenderSettingsPanel, AngleCraftGeneralRenderSettingsPanel, AngleCraftDenoiseSettingsPanel, AngleCraftRenderButtonPanel
+from .panels import AngleCraftObjectSettingsPanel, AngleCraftCameraSettingsPanel, AngleCraftCameraSphereSettingsPanel, AngleCraftEnvironmentSettingsPanel, AngleCraftRenderSettingsPanel, AngleCraftGeneralRenderSettingsPanel, AngleCraftDenoiseSettingsPanel, AngleCraftActionsButtonPanel
 from .settings import AngleCraftCameraSettings, AngleCraftCameraSphereSettings, AngleCraftRenderSettings, AngleCraftRenderButtonSettings, AngleCraftObjectSettings
 
 # Register and unregister the classes
@@ -27,7 +27,7 @@ def register():
     bpy.utils.register_class(AngleCraftGeneralRenderSettingsPanel)
     bpy.utils.register_class(AngleCraftDenoiseSettingsPanel)
 
-    bpy.utils.register_class(AngleCraftRenderButtonPanel)
+    bpy.utils.register_class(AngleCraftActionsButtonPanel)
 
     bpy.types.Scene.lora_camera_settings = bpy.props.PointerProperty(type=AngleCraftCameraSettings)
     bpy.types.Scene.lora_camera_sphere_settings = bpy.props.PointerProperty(type=AngleCraftCameraSphereSettings)
@@ -58,7 +58,7 @@ def unregister():
     bpy.utils.unregister_class(AngleCraftGeneralRenderSettingsPanel)
     bpy.utils.unregister_class(AngleCraftDenoiseSettingsPanel)
 
-    bpy.utils.unregister_class(AngleCraftRenderButtonPanel)
+    bpy.utils.unregister_class(AngleCraftActionsButtonPanel)
 
 
     del bpy.types.Scene.lora_camera_settings

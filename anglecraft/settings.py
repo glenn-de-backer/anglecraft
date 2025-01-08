@@ -121,17 +121,6 @@ class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
         default='weighted'
     )
 
-    remove_overlapping: bpy.props.BoolProperty(
-        name="Remove Overlapping",
-        default=False,
-        description="Remove overlapping cameras"
-    )
-    overlap_threshold: bpy.props.FloatProperty(
-        name="Overlap Threshold",
-        default=0.1,
-        min=0.0,
-        description="Minimum distance between cameras to avoid overlap"
-    )
 
 
 # Properties for render settings

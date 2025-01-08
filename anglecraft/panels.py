@@ -148,12 +148,12 @@ class AngleCraftDenoiseSettingsPanel(bpy.types.Panel):
         box.prop(params, "denoiser")
 
         
-# Panel for Render Button
-class AngleCraftRenderButtonPanel(bpy.types.Panel):
+# Panel for Actions Button
+class AngleCraftActionsButtonPanel(bpy.types.Panel):
     """
     Panel in the 3D View that contains the button to trigger the rendering process.
     """
-    bl_label = "Render"
+    bl_label = "Actions"
     bl_idname = "VIEW3D_PT_lora_render_button"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

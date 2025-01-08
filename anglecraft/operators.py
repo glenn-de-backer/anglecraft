@@ -413,7 +413,7 @@ class AngleCraftCreateCamerasOperator(bpy.types.Operator):
     radius, and sphere distribution type.
     """
     bl_idname = "object.create_lora_cameras"
-    bl_label = "Create Cameras"
+    bl_label = "Create Camera sphere"
     
     def execute(self, context):
         """
@@ -465,7 +465,7 @@ class AngleCraftRenderCamerasOperator(bpy.types.Operator):
     based on the user-defined settings such as render resolution, samples, denoising, etc.
     """
     bl_idname = "object.render_lora_cameras"
-    bl_label = "Render Cameras"
+    bl_label = "Render all cameras in sphere"
     
     def execute(self, context):
         """
@@ -500,7 +500,7 @@ class AngleCraftDeleteCamerasOperator(bpy.types.Operator):
     previously placed based on the settings.
     """
     bl_idname = "object.delete_lora_cameras"
-    bl_label = "Delete Cameras"
+    bl_label = "Delete Camera sphere"
     
     def execute(self, context):
         """
