@@ -67,8 +67,13 @@ class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
         box.prop(params, "max_radius")
         box.prop(params, "num_cameras_horizontal")
         box.prop(params, "num_cameras_vertical")
-        box.prop(params, "sphere_type")  # Add sphere type dropdown
-        box.prop(params, "half_sphere")  # Add half sphere option
+        box.prop(params, "sphere_type")
+        
+        # Disable the half sphere option for 'weighted' and 'equator_dense' sphere types
+        row = box.row()
+        row.enabled = params.sphere_type not in {'weighted', 'equator_dense'}
+        row.prop(params, "half_sphere", text="Half Sphere")
+        
         box.prop(params, "remove_overlapping")
         box.prop(params, "overlap_threshold")
         

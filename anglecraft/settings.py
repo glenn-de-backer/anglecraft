@@ -3,32 +3,56 @@ import bpy
 # Properties to control object settings
 class AngleCraftObjectSettings(bpy.types.PropertyGroup):
     """
-    Property group to manage settings related to the object being used for camera placement.
-    Includes dynamic generation of camera target and floor object lists.
+    Property group for object settings related to camera placement.
+
+    Attributes:
+        object_name (EnumProperty): The name of the target empty object for camera placement.
+        floor_object_name (EnumProperty): The name of the floor mesh object.
     """
     def update_object_list(self, context):
-        """Update object list for EnumProperty dynamically."""
+        """
+        Update method for the object list property.
+
+        Args:
+            context (bpy.types.Context): The context in which the update is happening.
+        """
         self["object_name"] = self.object_name
 
     def update_floor_list(self, context):
-        """Update floor object list for EnumProperty dynamically."""
+        """
+        Update method for the floor list property.
+
+        Args:
+            context (bpy.types.Context): The context in which the update is happening.
+        """
         self["floor_object_name"] = self.floor_object_name
 
     def object_enum_items(self, context):
         """
-        Generate items for object_name dynamically by selecting objects of type 'EMPTY'.
+        Generate a list of available empty objects in the scene.
+
+        Args:
+            context (bpy.types.Context): The context in which the function is called.
+
+        Returns:
+            list: A list of tuples containing empty objects' names.
         """
         return [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'EMPTY']
 
     def floor_enum_items(self, context):
         """
-        Generate items for floor_object_name dynamically by selecting objects of type 'MESH'.
-        Includes a 'None' option for optional selection.
+        Generate a list of available mesh objects in the scene.
+
+        Args:
+            context (bpy.types.Context): The context in which the function is called.
+
+        Returns:
+            list: A list of tuples containing mesh objects' names.
         """
         items = [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'MESH']
         items.insert(0, ('NONE', 'None', 'No object selected'))
         return items
-    
+
     object_name: bpy.props.EnumProperty(
         name="Camera target",
         description="Select the target empty for camera placement",
@@ -42,7 +66,6 @@ class AngleCraftObjectSettings(bpy.types.PropertyGroup):
         items=floor_enum_items,
         update=update_floor_list
     )
-
 
 # Properties to control object settings
 class AngleCraftCameraSettings(bpy.types.PropertyGroup):
