@@ -344,6 +344,11 @@ def render_cameras(output_directory, render_samples, denoise_enabled, denoiser, 
     floor_object_name = scene.lora_object_settings.floor_object_name
     floor_object = bpy.data.objects.get(floor_object_name) if floor_object_name else None
 
+    # Initialize the progress bar
+    wm = bpy.context.window_manager
+    total_steps = len(cameras_to_render)
+    wm.progress_begin(0, total_steps)
+
     # Iterate through each camera that was selected for rendering
     for i, camera in enumerate(cameras_to_render):
         scene.camera = camera  # Set the current camera for rendering
@@ -373,7 +378,7 @@ def render_cameras(output_directory, render_samples, denoise_enabled, denoiser, 
                 floor_object.hide_render = True  # Hide the floor object during rendering
 
         # Set the file path where the rendered image will be saved
-        filepath = os.path.join(output_directory, f"render_{i:03d}.jpg")
+        filepath = os.path.join(output_directory, f"render_{i:03d}.png")
         scene.render.filepath = filepath  # Set the render output path
 
         # Perform the render and save the image
@@ -382,6 +387,12 @@ def render_cameras(output_directory, render_samples, denoise_enabled, denoiser, 
         # If the floor object was hidden earlier, restore its visibility for subsequent renders
         if floor_object:
             floor_object.hide_render = False  # Restore render visibility
+
+        # Update the progress bar
+        wm.progress_update(i + 1)
+
+    # End the progress bar
+    wm.progress_end()
 
     # Print a message indicating how many images were rendered
     print(f"Rendered {len(cameras_to_render)} images to {output_directory}.")
@@ -479,6 +490,7 @@ class AngleCraftRenderCamerasOperator(bpy.types.Operator):
         """
         # Access render settings from the correct property group
         render_settings = context.scene.lora_render_settings
+
         
         render_cameras(
             output_directory=render_settings.output_directory,
@@ -489,6 +501,10 @@ class AngleCraftRenderCamerasOperator(bpy.types.Operator):
             hdri_folder=render_settings.hdri_folder,  # Pass the HDRI folder setting
             override_world=render_settings.override_world
         )
+
+        # Notify the user that rendering is complete
+        self.report({'INFO'}, "Rendering complete. Check the output directory for images.")
+                
         return {'FINISHED'}
 
 # Operator to delete cameras
