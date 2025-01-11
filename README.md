@@ -9,62 +9,45 @@ This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in A
 
 ## Features
 
-### Camera Sphere Generation
-Automatically create camera spheres with customizable parameters, including:
-- Adjustable radius.
-- Horizontal and vertical camera counts.
-- Sphere distribution types (e.g., linear, uniform, Fibonacci, weighted).
-- Half-sphere support for targeted angle captures.
+## Camera Sphere Generation  
+Create customizable camera spheres with features like:  
+- Adjustable radius for precise sphere scaling.  
+- Configurable horizontal and vertical camera counts.  
+- Multiple distribution types:  
+  - **Linear:** Evenly spaced on axes.  
+  - **Uniform:** Evenly spaced across the sphere.  
+  - **Fibonacci:** Natural, pole-avoidant arrangement.  
+  - **Weighted:** Upper/lower hemisphere emphasis.  
+  - **Half-sphere:** Focus on targeted areas.  
 
-### Dynamic Object Selection
-- **Camera Target:** The camera target is of the type **empty**. Cameras will be created around this empty object, with customizable settings for distance and positioning.
-- **Floor Mesh:** This is optional. You can specify a floor mesh to aid in the positioning of cameras, but it is not required.
+## Dynamic Object Selection  
+- **Camera Target:**  
+  - Use an empty object as the focus point.  
+  - Adjust distance and positioning around the target.  
+- **Floor Mesh (Optional):**  
+  - Assist in camera alignment for grounded objects.  
+  - Skip if unnecessary for your setup.  
 
-### Camera Settings
-- You can select an existing camera to use as a base for the cameras in your sphere. The selected camera will define properties such as the lens and other settings for all cameras created around the sphere.
+## Camera Settings  
+- Leverage an existing camera as a template:  
+  - Inherit lens properties and other settings.  
+  - Ensure uniformity across sphere cameras.  
 
-### Environment Setup
-- HDRI-based lighting with override options. If not overridden, the current world settings will be used.
-- Use of random HDRI environments
+## Environment Setup  
+- HDRI-based lighting for realistic illumination.  
+- Override options for custom lighting setups.  
+- Randomize HDRIs for diverse scene variations.  
+- Default to current world lighting if no HDRI is specified.  
 
-### Customizable Render Settings
-- Set output directories, resolution, and render samples.
-- Denoising options with support for OptiX and Open Image Denoise.
-
-### Streamlined Workflow
-Simple UI panels organized for ease of use:
-- Object Settings
-- Camera Settings
-- Camera Sphere Settings
-- Environment Settings
-- Render Settings
-
-### Batch Rendering
-- Automatically render multiple views with a single click.
-
-### Sphere Distribution Types
-AngleCraft supports multiple sphere distribution types, tailored for various use cases:
-- **Linear:** Cameras are spaced evenly along horizontal and vertical axes.
-- **Uniform:** Cameras are distributed evenly across the entire sphere.
-- **Fibonacci:** Uses a Fibonacci sequence to create a natural, evenly spaced distribution. Ideal for generating a more organic spread of cameras, avoiding clustering at the poles.
-- **80/20 Weighted:** 80% of the cameras are concentrated in the upper hemisphere, and 20% are in the lower hemisphere. This setup is perfect for scenarios where the top view of an object is more critical than the bottom.
-- **Equator Dense:** A denser concentration of cameras around the equator, suitable for capturing objects with significant details along the horizontal plane.
+## Render Settings  
+- Define output directories for organized renders.  
+- Set resolution, aspect ratio, and samples.  
+- Include denoising options:  
+  - **OptiX** for fast results.  
+  - **Open Image Denoise** for high-quality cleanup.  
 
 ## Applications
-AngleCraft is versatile and can be used for a wide range of purposes:
-
-### AI Training
-- Generate datasets for training LoRAs or other machine learning models.
-- Create synthetic data with controlled lighting and camera angles.
-
-### 3D Modeling
-- Capture assets from multiple perspectives for presentation or texture baking.
-
-### Animation and Visual Effects
-- Design complex camera setups for animations or visual effects production.
-
-### Non-AI Applications
-- Generate custom assets for game development, film, and product visualization.
+AngleCraft is primarily designed for generating high-quality AI training datasets, focusing on creating synthetic data with controlled lighting, camera angles, and environments. While its core purpose is to support machine learning model development, it also offers versatility for a variety of other application
 
 ## Installation
 
