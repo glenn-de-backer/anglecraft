@@ -240,6 +240,21 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
 
     master_camera.animation_data_clear()
 
+    # --- NEW: Setup Preview Empties Collection ---
+    preview_col_name = "AngleCraft_Preview"
+    preview_col = bpy.data.collections.get(preview_col_name)
+    if preview_col:
+        # Clear existing empties if the collection already exists
+        for obj in preview_col.objects:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    else:
+        # Create it and link it to the scene
+        preview_col = bpy.data.collections.new(preview_col_name)
+        scene.collection.children.link(preview_col)
+
+    # Ensure the collection is visible initially
+    preview_col.hide_viewport = False
+
     # --- Prep Floor for Keyframing ---
     floor_name = scene.lora_object_settings.floor_object_name
     floor_object = bpy.data.objects.get(floor_name) if floor_name != 'NONE' else None
@@ -255,7 +270,7 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
     scene.frame_end = total_frames
     random.seed(seed)
 
-    # 4. Insert Keyframes
+    # 4. Insert Keyframes & Build Preview
     for idx, point in enumerate(points):
         frame = idx + 1 
         radius = random.uniform(min_radius, max_radius)
@@ -267,6 +282,14 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
 
         master_camera.keyframe_insert(data_path="location", frame=frame)
         master_camera.keyframe_insert(data_path="rotation_euler", frame=frame)
+
+        # --- NEW: Generate Preview Empty ---
+        empty = bpy.data.objects.new(f"AC_Preview_{idx:03d}", None)
+        empty.empty_display_type = 'SPHERE' # Looks like a clean dot
+        empty.empty_display_size = 0.15 # Small enough to not be obtrusive
+        empty.location = camera_location
+        empty.rotation_euler = master_camera.rotation_euler
+        preview_col.objects.link(empty)
 
         if floor_object:
             is_below_floor = camera_location.z < floor_z_max
@@ -301,11 +324,24 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
 
 def delete_ai_cameras():
     """
-    Deletes the master animated camera created by AngleCraft.
+    Deletes the master animated camera and the preview collection.
     """
+    # Delete Master Camera
     cameras_to_delete = [camera for camera in bpy.data.objects if camera.type == 'CAMERA' and 'AngleCraft_Cam' in camera.name]
     for camera in cameras_to_delete:
         bpy.data.objects.remove(camera, do_unlink=True)
+
+    # --- NEW: Delete Preview Collection ---
+    preview_col = bpy.data.collections.get("AngleCraft_Preview")
+    if preview_col:
+        # Delete all empties inside
+        for obj in preview_col.objects:
+            bpy.data.objects.remove(obj, do_unlink=True)
+        # Unlink and remove collection
+        for scene in bpy.data.scenes:
+            if preview_col.name in scene.collection.children:
+                scene.collection.children.unlink(preview_col)
+        bpy.data.collections.remove(preview_col)
 
 
 # -------------------------------------------------------------------

@@ -123,6 +123,18 @@ class AngleCraftActionsButtonPanel(bpy.types.Panel):
         row.enabled = cameras_exist
         row.operator("object.delete_lora_cameras")
 
+        # --- NEW: Global Preview Toggle ---
+        preview_col = bpy.data.collections.get("AngleCraft_Preview")
+        if preview_col:
+            row = box.row()
+            # Change text and icon based on visibility state
+            is_hidden = preview_col.hide_viewport
+            toggle_text = "Show Preview Guides" if is_hidden else "Hide Preview Guides"
+            toggle_icon = 'HIDE_ON' if is_hidden else 'HIDE_OFF'
+            
+            # Using toggle=True makes it look like a nice big button
+            row.prop(preview_col, "hide_viewport", text=toggle_text, icon=toggle_icon, toggle=True)
+
         # Add another box for the label to avoid overlap
         info_box = layout.box()
         info_box.label(text=f"Total Frames: {params.info_num_cameras}", icon='INFO')
