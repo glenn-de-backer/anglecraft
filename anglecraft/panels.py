@@ -21,27 +21,6 @@ class AngleCraftObjectSettingsPanel(bpy.types.Panel):
         box.prop(params, "object_name")
         box.prop(params, "floor_object_name")
 
-        
-# Panel for Camera settings
-class AngleCraftCameraSettingsPanel(bpy.types.Panel):
-    """
-    Panel in the 3D View that contains the button to trigger the rendering process.
-    """
-    bl_label = "Camera settings"
-    bl_idname = "VIEW3D_PT_lora_camera_settings"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AngleCraft'
-
-    def draw(self, context):
-        """Draw the Camera Settings panel in the UI."""
-        layout = self.layout
-        scene = context.scene
-        params = scene.lora_camera_settings
-                
-        box = layout.box()
-        box.prop(params, "camera_base")
-
 
 # Panel for Camera Sphere Settings
 class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
@@ -76,6 +55,10 @@ class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
         
         box.prop(params, "remove_overlapping")
         box.prop(params, "overlap_threshold")
+
+        # Expose the random seed property to the UI
+        layout.separator()
+        box.prop(params, "random_seed")
         
 # Panel for Environment Settings
 class AngleCraftEnvironmentSettingsPanel(bpy.types.Panel):
@@ -102,67 +85,9 @@ class AngleCraftEnvironmentSettingsPanel(bpy.types.Panel):
         # HDRI folder selection
         box.prop(params, "hdri_folder")
 
-# Main Render Settings Panel
-class AngleCraftRenderSettingsPanel(bpy.types.Panel):
-    """
-    Main panel in the 3D View for setting render-related settings.
-    """
-    bl_label = "Render Settings"
-    bl_idname = "VIEW3D_PT_lora_render_settings"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AngleCraft'
+        # Expose the Frames per HDRI property
+        box.prop(params, "frames_per_hdri")
 
-    def draw(self, context):
-        """Draw the Render Settings panel in the UI."""
-        layout = self.layout
-
-# Subpanel for General Render Settings
-class AngleCraftGeneralRenderSettingsPanel(bpy.types.Panel):
-    """
-    Subpanel in the Render Settings panel for general render settings.
-    """
-    bl_label = "General Settings"
-    bl_idname = "VIEW3D_PT_lora_general_render_settings"
-    bl_parent_id = "VIEW3D_PT_lora_render_settings"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AngleCraft'
-    bl_options = {'DEFAULT_CLOSED'}
-
-    def draw(self, context):
-        """Draw the General Render Settings panel in the UI."""
-        layout = self.layout
-        scene = context.scene
-        params = scene.lora_render_settings
-
-        box = layout.box()
-        box.prop(params, "output_directory")
-        box.prop(params, "render_samples")
-        box.prop(params, "render_resolution")
-
-# Subpanel for Denoising Settings
-class AngleCraftDenoiseSettingsPanel(bpy.types.Panel):
-    """
-    Subpanel in the Render Settings panel for denoising settings.
-    """
-    bl_label = "Denoise Settings"
-    bl_idname = "VIEW3D_PT_lora_denoise_settings"
-    bl_parent_id = "VIEW3D_PT_lora_render_settings"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AngleCraft'
-    bl_options = {'DEFAULT_CLOSED'}
-
-    def draw(self, context):
-        """Draw the Denoise Settings panel in the UI."""
-        layout = self.layout
-        scene = context.scene
-        params = scene.lora_render_settings
-
-        box = layout.box()
-        box.prop(params, "denoise_enabled")
-        box.prop(params, "denoiser")
 
 # Panel for Actions Button
 class AngleCraftActionsButtonPanel(bpy.types.Panel):
@@ -186,8 +111,8 @@ class AngleCraftActionsButtonPanel(bpy.types.Panel):
         # Check if a target empty is selected
         target_selected = bool(context.scene.lora_object_settings.object_name)
         
-        # Check if any cameras with '_ai' suffix exist
-        cameras_exist = any(camera for camera in bpy.data.objects if camera.type == 'CAMERA' and '_ai' in camera.name)
+        # Check if any cameras with '_AngleCraft_Cam' exist
+        cameras_exist = any(camera for camera in bpy.data.objects if camera.type == 'CAMERA' and 'AngleCraft_Cam' in camera.name)
 
         # Create buttons and disable them if no target empty is selected or no cameras exist
         row = box.row()
@@ -197,11 +122,11 @@ class AngleCraftActionsButtonPanel(bpy.types.Panel):
         row = box.row()
         row.enabled = cameras_exist
         row.operator("object.delete_lora_cameras")
-        
-        row = box.row()
-        row.enabled = cameras_exist
-        row.operator("object.render_lora_cameras")
 
         # Add another box for the label to avoid overlap
         info_box = layout.box()
-        info_box.label(text=f"Number of cameras: {params.info_num_cameras}", icon='INFO')
+        info_box.label(text=f"Total Frames: {params.info_num_cameras}", icon='INFO')
+        
+        # Guide the user to use Blender's native rendering
+        if cameras_exist:
+            info_box.label(text="Use Render Animation (Ctrl+F12)", icon='RENDER_ANIMATION')

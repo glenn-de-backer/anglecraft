@@ -12,42 +12,24 @@ class AngleCraftObjectSettings(bpy.types.PropertyGroup):
     def update_object_list(self, context):
         """
         Update method for the object list property.
-
-        Args:
-            context (bpy.types.Context): The context in which the update is happening.
         """
         self["object_name"] = self.object_name
 
     def update_floor_list(self, context):
         """
         Update method for the floor list property.
-
-        Args:
-            context (bpy.types.Context): The context in which the update is happening.
         """
         self["floor_object_name"] = self.floor_object_name
 
     def object_enum_items(self, context):
         """
         Generate a list of available empty objects in the scene.
-
-        Args:
-            context (bpy.types.Context): The context in which the function is called.
-
-        Returns:
-            list: A list of tuples containing empty objects' names.
         """
         return [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'EMPTY']
 
     def floor_enum_items(self, context):
         """
         Generate a list of available mesh objects in the scene.
-
-        Args:
-            context (bpy.types.Context): The context in which the function is called.
-
-        Returns:
-            list: A list of tuples containing mesh objects' names.
         """
         items = [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'MESH']
         items.insert(0, ('NONE', 'None', 'No object selected'))
@@ -67,22 +49,6 @@ class AngleCraftObjectSettings(bpy.types.PropertyGroup):
         update=update_floor_list
     )
 
-# Properties to control object settings
-class AngleCraftCameraSettings(bpy.types.PropertyGroup):
-    def object_enum_cameras(self, context):
-        """
-        Generate items for camera_base dynamically by selecting objects of type 'CAMERA'.
-        """
-        items = [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'CAMERA']
-        items.insert(0, ("None", "None", "Do not clone any camera"))  # Add the 'None' option at the beginning
-        return items
-    
-    camera_base: bpy.props.EnumProperty(
-        name="Camera Base",
-        description="Select the camera that will function as the one to clone",
-        items=object_enum_cameras
-    )
-    
 
 # Properties to control camera sphere settings
 class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
@@ -155,53 +121,19 @@ class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
         min=0.0,
         description="Minimum distance between cameras to avoid overlap"
     )
+    
+    random_seed: bpy.props.IntProperty(
+        name="Random Seed",
+        default=42,
+        description="Seed for Fibonacci offsets and radius randomization"
+    )
 
 
-# Properties for render settings
+# Properties for render settings (Now purely Environment/HDRI settings)
 class AngleCraftRenderSettings(bpy.types.PropertyGroup):
     """
-    Property group for controlling the render settings such as output directory, 
-    render samples, denoiser, and resolution.
+    Property group for controlling the HDRI automation environment settings.
     """
-    output_directory: bpy.props.StringProperty(
-        name="Output Directory",
-        default="//output",
-        description="Directory to save rendered images",
-        subtype='DIR_PATH'  # Use folder selection dialog
-    )
-    
-    render_samples: bpy.props.IntProperty(
-        name="Render Samples",
-        default=128,
-        min=1,
-        description="Number of render samples"
-    )
-    
-    denoise_enabled: bpy.props.BoolProperty(
-        name="Enable Denoising",
-        default=True,
-        description="Enable or disable denoising for the rendered image"
-    )
-    
-    denoiser: bpy.props.EnumProperty(
-        name="Denoiser",
-        description="Choose the denoiser to use",
-        items=[
-            ('OPTIX', 'OPTIX', 'Use NVIDIA OptiX denoiser'),
-            ('OPENIMAGEDENOISE', 'Open Image Denoise', 'Use Intel Open Image Denoise'),
-            ('NONE', 'None', 'No denoising applied')
-        ],
-        default='OPTIX'  # Default to OPTIX if no choice is made
-    )
-    
-    render_resolution: bpy.props.IntVectorProperty(
-        name="Resolution",
-        default=(512, 512),
-        size=2,
-        min=1,
-        description="Resolution for rendering"
-    )
-    
     hdri_folder: bpy.props.StringProperty(
         name="HDRI Folder",
         default="",
@@ -215,11 +147,11 @@ class AngleCraftRenderSettings(bpy.types.PropertyGroup):
         description="Override the current world settings with a new HDRI"
     )
 
-
-    render_depth_maps: bpy.props.BoolProperty(
-        name="Render Depth Maps",
-        default=False,
-        description="Enable or disable rendering of depth maps"
+    frames_per_hdri: bpy.props.IntProperty(
+        name="Frames per HDRI",
+        default=1,
+        min=1,
+        description="How many frames to stay on one HDRI before switching"
     )
 
 # Properties to control object settings
@@ -230,4 +162,3 @@ class AngleCraftRenderButtonSettings(bpy.types.PropertyGroup):
         description="Number of cameras/renders that will be produced",
         options={'HIDDEN'}  # Hide this property from the UI
     )
-
