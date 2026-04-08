@@ -25,11 +25,10 @@ class AngleCraftObjectSettingsPanel(bpy.types.Panel):
 # Panel for Camera Sphere Settings
 class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
     """
-    Panel in the 3D View for setting the camera sphere parameters such as radius,
-    number of cameras, and distribution type.
+    Panel in the 3D View that contains the camera sphere settings.
     """
     bl_label = "Camera Sphere Settings"
-    bl_idname = "VIEW3D_PT_lora_camera_sphere_settings"
+    bl_idname = "VIEW3D_PT_lora_camera_sphere"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AngleCraft'
@@ -42,22 +41,34 @@ class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
 
         box = layout.box()
         
+        # 1. Always show the Distribution Type dropdown first
+        box.prop(params, "sphere_type")
+
+        # 2. DYNAMIC UI: Hide sliders if AI Blueprint is active
+        if params.sphere_type == 'ai_blueprint':
+            blueprint_box = box.box()
+            blueprint_box.label(text="AI Blueprint Active", icon='FILE_IMAGE')
+            
+            # Calculate and display the exact number of views to the user
+            total_views = 9 if params.half_sphere else 14
+            blueprint_box.label(text=f"Fixed Camera Count: {total_views}", icon='CAMERA_DATA')
+            blueprint_box.label(text="(4 Cardinals, 4 Isometrics, Top/Bottom)")
+        else:
+            # Show the standard sliders for all other mathematical distributions
+            box.prop(params, "num_cameras_horizontal")
+            box.prop(params, "num_cameras_vertical")
+
+        # 3. Always show these universal settings
+        box.prop(params, "half_sphere")
         box.prop(params, "min_radius")
         box.prop(params, "max_radius")
-        box.prop(params, "num_cameras_horizontal")
-        box.prop(params, "num_cameras_vertical")
-        box.prop(params, "sphere_type")
-        
-        # Disable the half sphere option for 'weighted' and 'equator_dense' sphere types
-        row = box.row()
-        row.enabled = params.sphere_type not in {'weighted', 'equator_dense'}
-        row.prop(params, "half_sphere", text="Half Sphere")
-        
-        box.prop(params, "remove_overlapping")
-        box.prop(params, "overlap_threshold")
 
-        # Expose the random seed property to the UI
-        layout.separator()
+        # 4. Overlap and Seed settings
+        overlap_box = box.box()
+        overlap_box.prop(params, "remove_overlapping")
+        if params.remove_overlapping:
+            overlap_box.prop(params, "overlap_threshold")
+            
         box.prop(params, "random_seed")
         
 # Panel for Environment Settings

@@ -168,6 +168,40 @@ def equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, rad
             points.append((x, y, z))
     return points
 
+# --- NEW: AI Blueprint Distribution ---
+def ai_blueprint_distribution(radius, half_sphere=False):
+    """Generates the ideal views for Image-to-Image AI models (Vizcom, Gemini, etc.)"""
+    points = []
+
+    # 1. Cardinal Views (Equator / Horizon)
+    points.append((0, -radius, 0))  # Front (-Y)
+    points.append((radius, 0, 0))   # Right (+X)
+    points.append((0, radius, 0))   # Back (+Y)
+    points.append((-radius, 0, 0))  # Left (-X)
+
+    # 2. Isometric Top Views (45-degree elevation 3/4 views)
+    z_elev = radius * 0.7071 # sin(45)
+    xy_radius = radius * 0.7071 # cos(45)
+    xy_offset = xy_radius * 0.7071 # 45 degrees on the XY plane
+
+    points.append((xy_offset, -xy_offset, z_elev))  # Top Front-Right
+    points.append((xy_offset, xy_offset, z_elev))   # Top Back-Right
+    points.append((-xy_offset, xy_offset, z_elev))  # Top Back-Left
+    points.append((-xy_offset, -xy_offset, z_elev)) # Top Front-Left
+
+    # 3. Top View
+    points.append((0, 0, radius))
+
+    # 4. Bottom and Isometric Bottom Views (If not half sphere)
+    if not half_sphere:
+        points.append((0, 0, -radius)) # Bottom
+        points.append((xy_offset, -xy_offset, -z_elev))  # Bottom Front-Right
+        points.append((xy_offset, xy_offset, -z_elev))   # Bottom Back-Right
+        points.append((-xy_offset, xy_offset, -z_elev))  # Bottom Back-Left
+        points.append((-xy_offset, -xy_offset, -z_elev)) # Bottom Front-Left
+
+    return points
+
 def remove_overlapping_cameras(points, threshold):
     filtered_points = []
     for point in points:
@@ -227,6 +261,8 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
         points = equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, radius=1.0, half_sphere=half_sphere)
     elif distribution_type == "weighted":
         points = weighted_distribution(num_cameras_horizontal * num_cameras_vertical, bias_ratio=0.8)
+    elif distribution_type == "ai_blueprint":  # --- NEW: Hook into the distribution type ---
+        points = ai_blueprint_distribution(radius=1.0, half_sphere=half_sphere)
 
     if remove_overlapping:
         points = remove_overlapping_cameras(points, overlap_threshold)

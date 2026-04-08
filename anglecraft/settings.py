@@ -106,6 +106,7 @@ class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
             ('fibonacci', 'Fibonacci', 'Fibonacci sphere distribution'),
             ('equator_dense', 'Equator Dense', 'Denser distribution of cameras at the equator'),
             ('weighted', 'Weighted (Top 80%, Bottom 20%)', '80% cameras on the top hemisphere, 20% on the bottom hemisphere'),
+            ('ai_blueprint', 'AI Blueprint (Vizcom/Gemini)', 'Ideal Cardinals and 3/4 views for Image-to-Image AI'), # <-- NEW
         ],
         default='weighted'
     )
@@ -115,6 +116,7 @@ class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
         default=False,
         description="Remove overlapping cameras"
     )
+    
     overlap_threshold: bpy.props.FloatProperty(
         name="Overlap Threshold",
         default=0.1,
@@ -153,6 +155,7 @@ class AngleCraftRenderSettings(bpy.types.PropertyGroup):
         min=1,
         description="How many frames to stay on one HDRI before switching"
     )
+
 
 # Properties to control object settings
 class AngleCraftRenderButtonSettings(bpy.types.PropertyGroup):
