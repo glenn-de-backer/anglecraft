@@ -2,35 +2,16 @@ import bpy
 
 # Properties to control object settings
 class AngleCraftObjectSettings(bpy.types.PropertyGroup):
-    """
-    Property group for object settings related to camera placement.
-
-    Attributes:
-        object_name (EnumProperty): The name of the target empty object for camera placement.
-        floor_object_name (EnumProperty): The name of the floor mesh object.
-    """
     def update_object_list(self, context):
-        """
-        Update method for the object list property.
-        """
         self["object_name"] = self.object_name
 
     def update_floor_list(self, context):
-        """
-        Update method for the floor list property.
-        """
         self["floor_object_name"] = self.floor_object_name
 
     def object_enum_items(self, context):
-        """
-        Generate a list of available empty objects in the scene.
-        """
         return [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'EMPTY']
 
     def floor_enum_items(self, context):
-        """
-        Generate a list of available mesh objects in the scene.
-        """
         items = [(obj.name, obj.name, "") for obj in bpy.data.objects if obj.type == 'MESH']
         items.insert(0, ('NONE', 'None', 'No object selected'))
         return items
@@ -49,119 +30,53 @@ class AngleCraftObjectSettings(bpy.types.PropertyGroup):
         update=update_floor_list
     )
 
-
 # Properties to control camera sphere settings
 class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
-    """
-    Property group for controlling the camera sphere settings such as radius, 
-    number of cameras, and distribution type.
-    """
-    min_radius: bpy.props.FloatProperty(
-        name="Min Radius",
-        default=10.0,
-        min=0.1,
-        description="Minimum distance of cameras from the object"
-    )
+    min_radius: bpy.props.FloatProperty(name="Min Radius", default=10.0, min=0.1)
+    max_radius: bpy.props.FloatProperty(name="Max Radius", default=10.0, min=0.1)
+    radius: bpy.props.FloatProperty(name="Radius", default=10.0, min=0.1)
     
-    max_radius: bpy.props.FloatProperty(
-        name="Max Radius",
-        default=10.0,
-        min=0.1,
-        description="Maximum distance of cameras from the object"
-    )
+    num_cameras_horizontal: bpy.props.IntProperty(name="Horizontal Cameras", default=16, min=1)
+    num_cameras_vertical: bpy.props.IntProperty(name="Vertical Cameras", default=8, min=1)
     
-    radius: bpy.props.FloatProperty(
-        name="Radius",
-        default=10.0,
-        min=0.1,
-        description="Distance of cameras from the object"
-    )
+    half_sphere: bpy.props.BoolProperty(name="Half Sphere", default=False)
     
-    num_cameras_horizontal: bpy.props.IntProperty(
-        name="Horizontal Cameras",
-        default=16,
-        min=1,
-        description="Number of cameras in the horizontal circle"
-    )
-    
-    num_cameras_vertical: bpy.props.IntProperty(
-        name="Vertical Cameras",
-        default=8,
-        min=1,
-        description="Number of vertical levels of cameras"
-    )
-    
-    half_sphere: bpy.props.BoolProperty(
-        name="Half Sphere",
-        default=False,
-        description="If checked, create only the upper half of the cameras"
-    )
+    # AI Blueprint Toggles
+    blueprint_cardinals: bpy.props.BoolProperty(name="Cardinals (Front, Back, L, R)", default=True)
+    blueprint_isometrics: bpy.props.BoolProperty(name="Isometrics (3/4 Views)", default=True)
+    blueprint_top_bottom: bpy.props.BoolProperty(name="Top / Bottom", default=True)
     
     sphere_type: bpy.props.EnumProperty(
         name="Sphere Type",
-        description="Select the type of sphere generation",
         items=[
             ('linear', 'Linear', 'Linear distribution of cameras'),
             ('uniform', 'Uniform', 'Uniform distribution of cameras'),
             ('fibonacci', 'Fibonacci', 'Fibonacci sphere distribution'),
             ('equator_dense', 'Equator Dense', 'Denser distribution of cameras at the equator'),
-            ('weighted', 'Weighted (Top 80%, Bottom 20%)', '80% cameras on the top hemisphere, 20% on the bottom hemisphere'),
-            ('ai_blueprint', 'AI Blueprint (Vizcom/Gemini)', 'Ideal Cardinals and 3/4 views for Image-to-Image AI'), # <-- NEW
+            ('weighted', 'Weighted (Top 80%, Bottom 20%)', '80% cameras on top, 20% on bottom'),
+            ('ai_blueprint', 'AI Blueprint (Vizcom/Gemini)', 'Ideal configurable views for AI'),
         ],
-        default='weighted'
+        default='ai_blueprint'
     )
 
-    remove_overlapping: bpy.props.BoolProperty(
-        name="Remove Overlapping",
-        default=False,
-        description="Remove overlapping cameras"
-    )
-    
-    overlap_threshold: bpy.props.FloatProperty(
-        name="Overlap Threshold",
-        default=0.1,
-        min=0.0,
-        description="Minimum distance between cameras to avoid overlap"
-    )
-    
-    random_seed: bpy.props.IntProperty(
-        name="Random Seed",
-        default=42,
-        description="Seed for Fibonacci offsets and radius randomization"
-    )
+    remove_overlapping: bpy.props.BoolProperty(name="Remove Overlapping", default=False)
+    overlap_threshold: bpy.props.FloatProperty(name="Overlap Threshold", default=0.1, min=0.0)
+    random_seed: bpy.props.IntProperty(name="Random Seed", default=42)
 
-
-# Properties for render settings (Now purely Environment/HDRI settings)
+# Properties for HDRI environment settings
 class AngleCraftRenderSettings(bpy.types.PropertyGroup):
-    """
-    Property group for controlling the HDRI automation environment settings.
-    """
     hdri_folder: bpy.props.StringProperty(
         name="HDRI Folder",
         default="",
-        description="Folder containing HDRI images",
-        subtype='DIR_PATH'  # Use folder selection dialog
+        subtype='DIR_PATH'
     )
-    
-    override_world: bpy.props.BoolProperty(
-        name="Override World",
-        default=False,
-        description="Override the current world settings with a new HDRI"
-    )
+    override_world: bpy.props.BoolProperty(name="Override World", default=False)
+    frames_per_hdri: bpy.props.IntProperty(name="Frames per HDRI", default=1, min=1)
 
-    frames_per_hdri: bpy.props.IntProperty(
-        name="Frames per HDRI",
-        default=1,
-        min=1,
-        description="How many frames to stay on one HDRI before switching"
-    )
-
-
-# Properties to control object settings
+# Properties for internal UI state
 class AngleCraftRenderButtonSettings(bpy.types.PropertyGroup):
     info_num_cameras: bpy.props.IntProperty(
         name="Number of Cameras",
         default=0,
-        description="Number of cameras/renders that will be produced",
-        options={'HIDDEN'}  # Hide this property from the UI
+        options={'HIDDEN'}
     )

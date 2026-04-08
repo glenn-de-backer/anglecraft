@@ -10,15 +10,10 @@ from bpy.app.handlers import persistent
 # -------------------------------------------------------------------
 @persistent
 def anglecraft_hdri_handler(scene, depsgraph=None):
-    """
-    Runs automatically on every frame change. 
-    Handles HDRI swapping dynamically and safely creates missing nodes.
-    """
     settings = scene.lora_render_settings
     hdri_folder = bpy.path.abspath(settings.hdri_folder)
     override_world = settings.override_world
     
-    # Abort if no folder, or if we have a World but Override is unchecked
     if not hdri_folder or not os.path.exists(hdri_folder):
         return
     if scene.world and not override_world:
@@ -29,13 +24,10 @@ def anglecraft_hdri_handler(scene, depsgraph=None):
     if hdri_files:
         frames_per = max(1, settings.frames_per_hdri)
         current_frame = scene.frame_current
-        
-        # Pick HDRI based on frame pacing
         index = (current_frame // frames_per) % len(hdri_files)
         hdri_filename = hdri_files[index]
         selected_hdri_path = os.path.join(hdri_folder, hdri_filename)
 
-        # 1. Ensure World exists
         if not scene.world:
             scene.world = bpy.data.worlds.new("AngleCraft_World")
             
@@ -43,7 +35,6 @@ def anglecraft_hdri_handler(scene, depsgraph=None):
         nodes = scene.world.node_tree.nodes
         links = scene.world.node_tree.links
 
-        # 2. Ensure Environment Texture node exists (Auto-create if missing)
         env_node = next((node for node in nodes if node.type == 'TEX_ENVIRONMENT'), None)
         if not env_node:
             env_node = nodes.new(type="ShaderNodeTexEnvironment")
@@ -51,16 +42,10 @@ def anglecraft_hdri_handler(scene, depsgraph=None):
             if bg_node:
                 links.new(env_node.outputs['Color'], bg_node.inputs['Color'])
 
-        # 3. Safely load and swap the image
         if env_node:
-            # Try to grab it from memory first (fastest)
             img = bpy.data.images.get(hdri_filename)
-            
-            # If it's not in memory yet, load it from the hard drive! (Fallback)
             if not img:
                 img = bpy.data.images.load(selected_hdri_path)
-                
-            # Only trigger an update if the image is actually different
             if env_node.image != img:
                 env_node.image = img
 
@@ -70,7 +55,6 @@ def anglecraft_hdri_handler(scene, depsgraph=None):
 def generate_sphere_points(num_horizontal, num_vertical, radius, hemisphere=None):
     points = []
     if num_horizontal <= 0 or num_vertical <= 0: return points
-
     for i in range(num_vertical):
         if hemisphere == 'top':
             vertical_angle = (math.pi / 2) * (i / (num_vertical - 1))  
@@ -110,10 +94,8 @@ def fibonacci_sphere(samples=1, radius=1.0, half_sphere=False, seed=0):
     for i in range(samples):
         z = 1 - (i / float(samples - 1)) * 2  
         if half_sphere and z < 0: continue  
-        
         radius_z = math.sqrt(1 - z * z)  
         theta = (phi * i) + offset  
-
         x = math.cos(theta) * radius_z
         y = math.sin(theta) * radius_z
         points.append((x * radius, y * radius, z * radius))
@@ -168,38 +150,34 @@ def equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, rad
             points.append((x, y, z))
     return points
 
-# --- NEW: AI Blueprint Distribution ---
-def ai_blueprint_distribution(radius, half_sphere=False):
-    """Generates the ideal views for Image-to-Image AI models (Vizcom, Gemini, etc.)"""
+def ai_blueprint_distribution(radius, half_sphere=False, use_cardinals=True, use_isometrics=True, use_top_bottom=True):
     points = []
+    if use_cardinals:
+        points.append((0, -radius, 0))  # Front
+        points.append((radius, 0, 0))   # Right
+        points.append((0, radius, 0))   # Back
+        points.append((-radius, 0, 0))  # Left
 
-    # 1. Cardinal Views (Equator / Horizon)
-    points.append((0, -radius, 0))  # Front (-Y)
-    points.append((radius, 0, 0))   # Right (+X)
-    points.append((0, radius, 0))   # Back (+Y)
-    points.append((-radius, 0, 0))  # Left (-X)
+    if use_isometrics:
+        z_elev = radius * 0.7071 
+        xy_radius = radius * 0.7071 
+        xy_offset = xy_radius * 0.7071 
 
-    # 2. Isometric Top Views (45-degree elevation 3/4 views)
-    z_elev = radius * 0.7071 # sin(45)
-    xy_radius = radius * 0.7071 # cos(45)
-    xy_offset = xy_radius * 0.7071 # 45 degrees on the XY plane
+        points.append((xy_offset, -xy_offset, z_elev))  
+        points.append((xy_offset, xy_offset, z_elev))   
+        points.append((-xy_offset, xy_offset, z_elev))  
+        points.append((-xy_offset, -xy_offset, z_elev)) 
+        
+        if not half_sphere:
+            points.append((xy_offset, -xy_offset, -z_elev))  
+            points.append((xy_offset, xy_offset, -z_elev))   
+            points.append((-xy_offset, xy_offset, -z_elev))  
+            points.append((-xy_offset, -xy_offset, -z_elev)) 
 
-    points.append((xy_offset, -xy_offset, z_elev))  # Top Front-Right
-    points.append((xy_offset, xy_offset, z_elev))   # Top Back-Right
-    points.append((-xy_offset, xy_offset, z_elev))  # Top Back-Left
-    points.append((-xy_offset, -xy_offset, z_elev)) # Top Front-Left
-
-    # 3. Top View
-    points.append((0, 0, radius))
-
-    # 4. Bottom and Isometric Bottom Views (If not half sphere)
-    if not half_sphere:
-        points.append((0, 0, -radius)) # Bottom
-        points.append((xy_offset, -xy_offset, -z_elev))  # Bottom Front-Right
-        points.append((xy_offset, xy_offset, -z_elev))   # Bottom Back-Right
-        points.append((-xy_offset, xy_offset, -z_elev))  # Bottom Back-Left
-        points.append((-xy_offset, -xy_offset, -z_elev)) # Bottom Front-Left
-
+    if use_top_bottom:
+        points.append((0, 0, radius)) 
+        if not half_sphere:
+            points.append((0, 0, -radius)) 
     return points
 
 def remove_overlapping_cameras(points, threshold):
@@ -213,20 +191,16 @@ def remove_overlapping_cameras(points, threshold):
 # -------------------------------------------------------------------
 # CORE GENERATION FUNCTION
 # -------------------------------------------------------------------
-def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, num_cameras_vertical, distribution_type="fibonacci", half_sphere=False, remove_overlapping=False, overlap_threshold=0.1, seed=0):
-    """
-    Sets up a single animated camera around a target object based on the selected distribution.
-    """
+def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, num_cameras_vertical, distribution_type="fibonacci", half_sphere=False, remove_overlapping=False, overlap_threshold=0.1, seed=0, blueprint_cardinals=True, blueprint_isometrics=True, blueprint_top_bottom=True):
     scene = bpy.context.scene
     target_object = bpy.data.objects.get(object_name)
     if not target_object:
         raise ValueError(f"Object named '{object_name}' not found!")
     
-    # --- World Node & HDRI Pre-loading ---
+    # World Node & HDRI Pre-loading
     settings = scene.lora_render_settings
     hdri_folder = bpy.path.abspath(settings.hdri_folder)
     override_world = settings.override_world
-    
     hdri_files = [] 
 
     if hdri_folder and os.path.exists(hdri_folder) and (override_world or not scene.world):
@@ -243,7 +217,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
             if bg_node:
                 links.new(env_node.outputs['Color'], bg_node.inputs['Color'])
 
-        # PRE-LOAD Images to memory
         hdri_files = [f for f in os.listdir(hdri_folder) if f.lower().endswith(('.hdr', '.exr'))]
         for f in hdri_files:
             img_path = os.path.join(hdri_folder, f)
@@ -261,8 +234,14 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
         points = equator_dense_distribution(num_cameras_horizontal, num_cameras_vertical, radius=1.0, half_sphere=half_sphere)
     elif distribution_type == "weighted":
         points = weighted_distribution(num_cameras_horizontal * num_cameras_vertical, bias_ratio=0.8)
-    elif distribution_type == "ai_blueprint":  # --- NEW: Hook into the distribution type ---
-        points = ai_blueprint_distribution(radius=1.0, half_sphere=half_sphere)
+    elif distribution_type == "ai_blueprint": 
+        points = ai_blueprint_distribution(
+            radius=1.0, 
+            half_sphere=half_sphere,
+            use_cardinals=blueprint_cardinals,
+            use_isometrics=blueprint_isometrics,
+            use_top_bottom=blueprint_top_bottom
+        )
 
     if remove_overlapping:
         points = remove_overlapping_cameras(points, overlap_threshold)
@@ -278,20 +257,18 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
 
     master_camera.animation_data_clear()
 
-    # --- Setup Preview Empties Collection ---
+    # 3. Setup Preview Empties Collection
     preview_col_name = "AngleCraft_Preview"
     preview_col = bpy.data.collections.get(preview_col_name)
     if preview_col:
-        # Wrap in list() to safely delete while iterating
         for obj in list(preview_col.objects):
             bpy.data.objects.remove(obj, do_unlink=True)
     else:
         preview_col = bpy.data.collections.new(preview_col_name)
         scene.collection.children.link(preview_col)
-
     preview_col.hide_viewport = False
 
-    # --- Prep Floor for Keyframing ---
+    # Prep Floor for Keyframing
     floor_name = scene.lora_object_settings.floor_object_name
     floor_object = bpy.data.objects.get(floor_name) if floor_name != 'NONE' else None
     
@@ -300,13 +277,13 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
         floor_object.animation_data_clear() 
         floor_z_max = max((floor_object.matrix_world @ Vector(corner)).z for corner in floor_object.bound_box)
 
-    # 3. Setup Timeline constraints
+    # 4. Timeline constraints
     total_frames = len(points)
     scene.frame_start = 1
     scene.frame_end = total_frames
     random.seed(seed)
 
-    # 4. Insert Keyframes & Build Preview
+    # 5. Insert Keyframes & Build Preview
     for idx, point in enumerate(points):
         frame = idx + 1 
         radius = random.uniform(min_radius, max_radius)
@@ -319,7 +296,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
         master_camera.keyframe_insert(data_path="location", frame=frame)
         master_camera.keyframe_insert(data_path="rotation_euler", frame=frame)
 
-        # Generate Preview Empty
         empty = bpy.data.objects.new(f"AC_Preview_{idx:03d}", None)
         empty.empty_display_type = 'SPHERE' 
         empty.empty_display_size = 0.15 
@@ -327,7 +303,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
         empty.rotation_euler = master_camera.rotation_euler
         preview_col.objects.link(empty)
 
-        # Floor hiding
         if floor_object:
             is_below_floor = camera_location.z < floor_z_max
             floor_object.hide_render = is_below_floor
@@ -335,16 +310,14 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
             floor_object.keyframe_insert(data_path="hide_render", frame=frame)
             floor_object.keyframe_insert(data_path="hide_viewport", frame=frame)
 
-    # --- BLENDER 5.0 SLOTTED ACTION FIX ---
+    # BLENDER 5.0 SLOTTED ACTION FIX
     if floor_object and floor_object.animation_data and floor_object.animation_data.action:
         anim_data = floor_object.animation_data
         fcurves = []
-        
         if hasattr(anim_data, "action_slot") and anim_data.action_slot:
             from bpy_extras import anim_utils
             channelbag = anim_utils.action_get_channelbag_for_slot(anim_data.action, anim_data.action_slot)
-            if channelbag:
-                fcurves = channelbag.fcurves
+            if channelbag: fcurves = channelbag.fcurves
         elif hasattr(anim_data.action, "fcurves"):
             fcurves = anim_data.action.fcurves
 
@@ -357,20 +330,14 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
 
 
 def delete_ai_cameras():
-    """
-    Deletes the master animated camera and the preview collection.
-    """
-    # Wrap in list() to prevent skipping cameras if multiple exist
     cameras_to_delete = [camera for camera in bpy.data.objects if camera.type == 'CAMERA' and 'AngleCraft_Cam' in camera.name]
     for camera in cameras_to_delete:
         bpy.data.objects.remove(camera, do_unlink=True)
 
     preview_col = bpy.data.collections.get("AngleCraft_Preview")
     if preview_col:
-        # Wrap in list() to safely delete all preview empties
         for obj in list(preview_col.objects):
             bpy.data.objects.remove(obj, do_unlink=True)
-            
         for scene in bpy.data.scenes:
             if preview_col.name in scene.collection.children:
                 scene.collection.children.unlink(preview_col)
@@ -397,7 +364,10 @@ class AngleCraftCreateCamerasOperator(bpy.types.Operator):
                 half_sphere=scene.lora_camera_sphere_settings.half_sphere,
                 remove_overlapping=scene.lora_camera_sphere_settings.remove_overlapping,
                 overlap_threshold=scene.lora_camera_sphere_settings.overlap_threshold,
-                seed=scene.lora_camera_sphere_settings.random_seed
+                seed=scene.lora_camera_sphere_settings.random_seed,
+                blueprint_cardinals=scene.lora_camera_sphere_settings.blueprint_cardinals,
+                blueprint_isometrics=scene.lora_camera_sphere_settings.blueprint_isometrics,
+                blueprint_top_bottom=scene.lora_camera_sphere_settings.blueprint_top_bottom
             )
             scene.lora_render_button_settings.info_num_cameras = total_frames        
             return {'FINISHED'}

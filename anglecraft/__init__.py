@@ -1,9 +1,7 @@
 import bpy
 
 from .operators import AngleCraftCreateCamerasOperator, AngleCraftDeleteCamerasOperator, anglecraft_hdri_handler
-
 from .panels import AngleCraftObjectSettingsPanel, AngleCraftCameraSphereSettingsPanel, AngleCraftEnvironmentSettingsPanel, AngleCraftActionsButtonPanel
-
 from .settings import AngleCraftCameraSphereSettings, AngleCraftRenderSettings, AngleCraftRenderButtonSettings, AngleCraftObjectSettings
 
 # Register and unregister the classes
@@ -29,7 +27,7 @@ def register():
     bpy.types.Scene.lora_object_settings = bpy.props.PointerProperty(type=AngleCraftObjectSettings)
     bpy.types.Scene.lora_render_button_settings = bpy.props.PointerProperty(type=AngleCraftRenderButtonSettings)
 
-    # --- Register the HDRI swap handler ---
+    # Register the HDRI swap handler
     if anglecraft_hdri_handler not in bpy.app.handlers.frame_change_pre:
         bpy.app.handlers.frame_change_pre.append(anglecraft_hdri_handler)
 
@@ -38,7 +36,7 @@ def unregister():
     """
     Unregisters all the Blender classes, properties, and handlers used by the addon.
     """
-    # --- Remove the HDRI swap handler ---
+    # Remove the HDRI swap handler
     if anglecraft_hdri_handler in bpy.app.handlers.frame_change_pre:
         bpy.app.handlers.frame_change_pre.remove(anglecraft_hdri_handler)
 
@@ -61,8 +59,4 @@ def unregister():
     del bpy.types.Scene.lora_render_button_settings 
 
 if __name__ == "__main__":
-    """
-    Main entry point for running the addon.
-    Calls the `register()` function to enable the addon in Blender.
-    """
     register()
