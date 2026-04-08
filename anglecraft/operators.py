@@ -3,7 +3,6 @@ import math
 from mathutils import Vector
 import os
 import random
-import json
 from bpy.app.handlers import persistent
 
 # -------------------------------------------------------------------
@@ -194,7 +193,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
     hdri_folder = bpy.path.abspath(settings.hdri_folder)
     override_world = settings.override_world
     
-    # FIX: Initialize hdri_files as an empty list so it always exists
     hdri_files = [] 
 
     if hdri_folder and os.path.exists(hdri_folder) and (override_world or not scene.world):
@@ -211,7 +209,7 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
             if bg_node:
                 links.new(env_node.outputs['Color'], bg_node.inputs['Color'])
 
-        # PRE-LOAD Images
+        # PRE-LOAD Images to memory
         hdri_files = [f for f in os.listdir(hdri_folder) if f.lower().endswith(('.hdr', '.exr'))]
         for f in hdri_files:
             img_path = os.path.join(hdri_folder, f)
@@ -248,7 +246,8 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
     preview_col_name = "AngleCraft_Preview"
     preview_col = bpy.data.collections.get(preview_col_name)
     if preview_col:
-        for obj in preview_col.objects:
+        # Wrap in list() to safely delete while iterating
+        for obj in list(preview_col.objects):
             bpy.data.objects.remove(obj, do_unlink=True)
     else:
         preview_col = bpy.data.collections.new(preview_col_name)
@@ -271,22 +270,7 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
     scene.frame_end = total_frames
     random.seed(seed)
 
-    # --- Prep Metadata Dictionary ---
-    frames_per = max(1, settings.frames_per_hdri)
-    metadata = {
-        "dataset_settings": {
-            "object_name": target_object.name,
-            "distribution_type": distribution_type,
-            "camera_count": total_frames,
-            "min_radius": min_radius,
-            "max_radius": max_radius,
-            "random_seed": seed,
-            "frames_per_hdri": frames_per
-        },
-        "frames": []
-    }
-
-    # 4. Insert Keyframes & Build Preview / Metadata
+    # 4. Insert Keyframes & Build Preview
     for idx, point in enumerate(points):
         frame = idx + 1 
         radius = random.uniform(min_radius, max_radius)
@@ -315,20 +299,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
             floor_object.keyframe_insert(data_path="hide_render", frame=frame)
             floor_object.keyframe_insert(data_path="hide_viewport", frame=frame)
 
-        # Record Frame Metadata
-        hdri_name = None
-        if hdri_files:
-            hdri_idx = (idx // frames_per) % len(hdri_files)
-            hdri_name = os.path.basename(hdri_files[hdri_idx])
-
-        metadata["frames"].append({
-            "frame": frame,
-            "image_name": f"render_{frame:04d}.png",
-            "hdri_file": hdri_name,
-            "camera_position": [round(camera_location.x, 4), round(camera_location.y, 4), round(camera_location.z, 4)],
-            "camera_rotation_euler": [round(master_camera.rotation_euler.x, 4), round(master_camera.rotation_euler.y, 4), round(master_camera.rotation_euler.z, 4)]
-        })
-
     # --- BLENDER 5.0 SLOTTED ACTION FIX ---
     if floor_object and floor_object.animation_data and floor_object.animation_data.action:
         anim_data = floor_object.animation_data
@@ -347,23 +317,6 @@ def create_cameras(object_name, min_radius, max_radius, num_cameras_horizontal, 
                 for kf in fcurve.keyframe_points:
                     kf.interpolation = 'CONSTANT'
 
-    # --- EXPORT JSON TO NATIVE BLENDER OUTPUT PATH ---
-    render_filepath = bpy.path.abspath(scene.render.filepath)
-    output_dir = os.path.dirname(render_filepath)
-    
-    if not output_dir:
-        output_dir = bpy.path.abspath("//")
-
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
-        
-        json_path = os.path.join(output_dir, "anglecraft_metadata.json")
-        with open(json_path, 'w') as f:
-            json.dump(metadata, f, indent=4)
-        print(f"AngleCraft Metadata saved to: {json_path}")
-
-        scene.render.filepath = os.path.join(output_dir, "render_")
-
     return master_camera, total_frames
 
 
@@ -371,14 +324,17 @@ def delete_ai_cameras():
     """
     Deletes the master animated camera and the preview collection.
     """
+    # Wrap in list() to prevent skipping cameras if multiple exist
     cameras_to_delete = [camera for camera in bpy.data.objects if camera.type == 'CAMERA' and 'AngleCraft_Cam' in camera.name]
     for camera in cameras_to_delete:
         bpy.data.objects.remove(camera, do_unlink=True)
 
     preview_col = bpy.data.collections.get("AngleCraft_Preview")
     if preview_col:
-        for obj in preview_col.objects:
+        # Wrap in list() to safely delete all preview empties
+        for obj in list(preview_col.objects):
             bpy.data.objects.remove(obj, do_unlink=True)
+            
         for scene in bpy.data.scenes:
             if preview_col.name in scene.collection.children:
                 scene.collection.children.unlink(preview_col)
