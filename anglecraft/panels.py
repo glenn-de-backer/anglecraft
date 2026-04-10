@@ -49,9 +49,7 @@ class AngleCraftCameraSphereSettingsPanel(bpy.types.Panel):
                 
             blueprint_box.separator()
             blueprint_box.label(text=f"Total Cameras Generated: {total_views}", icon='CAMERA_DATA')
-            
-            if total_views > 10:
-                blueprint_box.label(text="Warning: Exceeds Gemini 10-image limit", icon='ERROR')
+
         else:
             box.prop(params, "num_cameras_horizontal")
             box.prop(params, "num_cameras_vertical")

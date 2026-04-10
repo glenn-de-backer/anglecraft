@@ -54,7 +54,7 @@ class AngleCraftCameraSphereSettings(bpy.types.PropertyGroup):
             ('fibonacci', 'Fibonacci', 'Fibonacci sphere distribution'),
             ('equator_dense', 'Equator Dense', 'Denser distribution of cameras at the equator'),
             ('weighted', 'Weighted (Top 80%, Bottom 20%)', '80% cameras on top, 20% on bottom'),
-            ('ai_blueprint', 'AI Blueprint (Vizcom/Gemini)', 'Ideal configurable views for AI'),
+            ('ai_blueprint', 'AI Blueprint (Vizcom/Gemini/...)', 'Ideal configurable views for AI'),
         ],
         default='ai_blueprint'
     )
