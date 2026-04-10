@@ -1,8 +1,10 @@
 # AngleCraft
 
-**AngleCraft** is a powerful Blender add-on designed to simplify the generation of multi-view synthetic data for AI training, 3D modeling, and various other applications. With AngleCraft, you can create sophisticated camera spheres to capture objects from multiple angles, customize render settings, and easily manage environments for seamless data creation.
+**AngleCraft** is a powerful Blender add-on designed to simplify the generation of multi-view synthetic data for AI training, 3D modeling, and various other applications. With AngleCraft, you can create sophisticated camera paths to capture objects from multiple angles, seamlessly swap HDRIs, and manage environments for flawless dataset creation.
 
-This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in AI training but is also highly versatile, making it suitable for both AI-related and non-AI applications, such as 3D asset creation, animation, and visual effects.
+This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) and Image-to-Image models (like Vizcom, Gemini, and Midjourney), but is also highly versatile, making it suitable for 3D asset presentation, animation, and visual effects.
+
+*(Fully compatible with Blender 5.0+)*
 
 ![Interface](images/gui.jpg)
 
