@@ -62,18 +62,17 @@ AngleCraft bridges the gap between 3D scene setup and AI generation. Its highly 
 ## Usage
 
 1. Open the **AngleCraft** tab in the 3D View sidebar.
-2. Set your **Camera Target** (of type **empty**) and optionally, set your **Floor Mesh** in the **Object Settings** panel.
-3. Configure your **Camera Sphere Settings**, including the radius, camera count, and distribution type.
-4. In the **Camera Settings** panel, you can select an existing camera to use as a base for the cameras in your sphere. The base camera will define properties such as the lens and other settings for the cameras created around the sphere.
-5. Adjust **Environment Settings**, select the folder where your HDRI's are stored. If HDRI is not overridden, the current world settings will be used.
-6. **Fine-tune Render Settings**:
-    - Set your **output folder** where the rendered images will be stored.
-    - Adjust other settings such as resolution and render samples.
-7. Use the **Render Panel** to:
-    - Create cameras.
-    - Delete existing cameras.
-    - Start rendering your multi-view data.
-8. Check the output directory for rendered images.
+2. Set your **Camera Target** (of type **Empty**) and optionally, set your **Floor Mesh** in the **Object Settings** panel.
+3. Configure your **Camera Sphere Settings**:
+    - Choose a mathematical distribution or the **AI Blueprint** mode. (The UI will dynamically adapt to show you exactly how many frames will be generated).
+    - Set your radius, overlap thresholds, and random seed.
+4. Adjust **Environment Settings**: 
+    - Select the folder where your HDRIs are stored. Check **Override World** to allow AngleCraft to dynamically swap them during playback.
+5. Under **Actions**, click **Create Camera Animation**.
+6. Toggle **Show/Hide Preview Guides** to visualize your exact camera locations in the viewport.
+7. **Render your Dataset**:
+    - Use Blender's native **Output Properties** (the printer icon) to set your save folder, resolution, and file format.
+    - Press **Ctrl+F12** (Render Animation) to generate your perfectly aligned dataset!
 
 
 ## Training is Not Part of This Add-on
