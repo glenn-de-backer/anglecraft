@@ -6,48 +6,50 @@ This tool is ideal for generating datasets for LoRAs (Low-Rank Adaptations) in A
 
 ![Interface](images/gui.jpg)
 
-
 ## Features
 
-## Camera Sphere Generation  
-Create customizable camera spheres with features like:  
+### Camera Sphere & Path Generation  
+Create customizable, mathematically perfect camera animations with features like:  
 - Adjustable radius for precise sphere scaling.  
 - Configurable horizontal and vertical camera counts.  
 - Multiple distribution types:  
+  - **AI Blueprint:** Configurable, exact views (Cardinals, Isometrics, Top/Bottom) optimized specifically for Image-to-Image AI models. 
   - **Linear:** Evenly spaced on axes.  
   - **Uniform:** Evenly spaced across the sphere.  
   - **Fibonacci:** Natural, pole-avoidant arrangement.  
   - **Weighted:** Upper/lower hemisphere emphasis.  
-  - **Half-sphere:** Focus on targeted areas.  
+  - **Half-sphere:** Focus on targeted upper areas.  
+
+### Global Viewport Preview  
+- Instantly visualize your exact camera angles before rendering using a lightweight cloud of Empties.
+- Toggle "Show/Hide Preview Guides" directly from the UI without cluttering your scene or slowing down your viewport.
+
+### Procedural Animation Workflow  
+- AngleCraft uses a single, intelligently keyframed master camera (`AngleCraft_Cam`) rather than generating dozens of static cameras. 
+- Automatically hides your floor mesh when the camera dips below the horizon line.
+
+### Dynamic Environment Setup  
+- HDRI-based lighting for realistic illumination.  
+- Dynamic frame-by-frame HDRI swapping: perfectly syncs environment changes to camera movements.
+- Configurable pacing (e.g., change the HDRI every 1, 2, or 5 frames).
+- Pre-loads HDRIs to memory to ensure absolute stability during rendering.
+
+### Native Blender Integration  
+- AngleCraft is a non-destructive scene setup tool. It relies entirely on Blender's native **Render Animation (Ctrl+F12)** and standard Output Properties, guaranteeing compatibility with your preferred render engine (Cycles, Eevee), resolution, and denoising settings.
 
 ## Dynamic Object Selection  
-- **Camera Target:**  
-  - Use an empty object as the focus point.  
+- **Camera Target:** - Use an empty object as the focus point.  
   - Adjust distance and positioning around the target.  
-- **Floor Mesh (Optional):**  
-  - Assist in camera alignment for grounded objects.  
-  - Skip if unnecessary for your setup.  
-
-## Camera Settings  
-- Leverage an existing camera as a template:  
-  - Inherit lens properties and other settings.  
-  - Ensure uniformity across sphere cameras.  
-
-## Environment Setup  
-- HDRI-based lighting for realistic illumination.  
-- Override options for custom lighting setups.  
-- Randomize HDRIs for diverse scene variations.  
-- Default to current world lighting if no HDRI is specified.  
-
-## Render Settings  
-- Define output directories for organized renders.  
-- Set resolution, aspect ratio, and samples.  
-- Include denoising options:  
-  - **OptiX** for fast results.  
-  - **Open Image Denoise** for high-quality cleanup.  
+- **Floor Mesh (Optional):** - Assist in camera alignment for grounded objects.  
+  - Automatically hidden from renders when the camera angle goes below it.
 
 ## Applications
-AngleCraft is primarily designed for generating high-quality AI training datasets, focusing on creating synthetic data with controlled lighting, camera angles, and environments. While its core purpose is to support machine learning model development, it also offers versatility for a variety of other application
+AngleCraft bridges the gap between 3D scene setup and AI generation. Its highly configurable camera paths make it incredibly versatile for a variety of workflows:
+
+- **Direct AI Blueprints (Image-to-Image):** Generate the exact orthographic, isometric, and cardinal views required by multimodal AI models like Gemini, Vizcom, Midjourney, or ControlNet. By feeding these perfectly aligned 3D reference images into the AI, you can maintain strict volume and composition while generating new concepts, material variations, and high-fidelity renders.
+- **Dataset Synthesis (LoRA Training):** Synthesize massive, high-quality multi-view datasets with controlled lighting and dynamically randomized environments to train custom AI models.
+- **3D Asset Presentation:** Quickly generate automated turntables, showcase renders, and standardized asset catalog images without manually moving the camera.
+- **Animation & VFX:** Use the procedural mathematical paths (Fibonacci, Equator Dense, etc.) for smooth, perfectly spaced fly-arounds in your standard Blender animation projects.
 
 ## Installation
 
