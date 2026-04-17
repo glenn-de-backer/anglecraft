@@ -91,11 +91,12 @@ Below is an example of a dataset processed with **FluxGym** using images created
 
 For more information on how to use these datasets for training, please check out the [FluxGym repository](https://github.com/cocktailpeanut/fluxgym).
 
+### Gemini example
+
+![Gemini examples](images/gemini_example.jpg)
 
 ### Vizcom example
 
-
-### Gemini example
 
 
 
