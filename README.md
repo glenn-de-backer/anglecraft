@@ -97,6 +97,7 @@ For more information on how to use these datasets for training, please check out
 
 ### Vizcom example
 
+![Vizcom examples](images/vizcom_example.jpg)
 
 
 
